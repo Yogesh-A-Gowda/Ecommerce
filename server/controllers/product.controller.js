@@ -1,5 +1,25 @@
 import { redis } from "../lib/redis.js";
 import cloudinary from "../lib/cloudinary.js";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Get the directory of the current file
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Example: Resolving the .env file path
+import dotenv from 'dotenv';
+dotenv.config({ path: `${__dirname}/../.env` });
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Your Cloudinary Cloud Name
+  api_key: process.env.CLOUDINARY_API_KEY, // Your Cloudinary API Key
+  api_secret: process.env.CLOUDINARY_API_SECRET, // Your Cloudinary API Secret
+});
+
+
+
 import Product from "../models/product.model.js";
 
 export const getAllProducts = async (req, res) => {
@@ -39,30 +59,31 @@ export const getFeaturedProducts = async (req, res) => {
 	}
 };
 
+
 export const createProduct = async (req, res) => {
 	try {
-		const { name, description, price, image, category } = req.body;
-
-		let cloudinaryResponse = null;
-
-		if (image) {
-			cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
-		}
-
-		const product = await Product.create({
-			name,
-			description,
-			price,
-			image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
-			category,
-		});
-
-		res.status(201).json(product);
+	  const { name, description, price, image, category } = req.body;
+  
+	  let cloudinaryResponse = null;
+  
+	  if (image) {
+		cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+	  }
+  
+	  const product = await Product.create({
+		name,
+		description,
+		price,
+		image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
+		category,
+	  });
+  
+	  res.status(201).json(product);
 	} catch (error) {
-		console.log("Error in createProduct controller", error.message);
-		res.status(500).json({ message: "Server error", error: error.message });
+	  console.log("Error in createProduct controller", error.message);
+	  res.status(500).json({ message: "Server error", error: error.message });
 	}
-};
+  };
 
 export const deleteProduct = async (req, res) => {
 	try {
