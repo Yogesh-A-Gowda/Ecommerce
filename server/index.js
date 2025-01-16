@@ -17,12 +17,12 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser())
 
-// const corsOptions = {
-//     origin: "http://localhost:5173", // Allow only your frontend origin
-//     credentials: true, // Allow cookies
-//   };
+const corsOptions = {
+    origin: "https://benevolent-belekoy-c4f0aa.netlify.app", // Allow only your frontend origin
+    credentials: true, // Allow cookies
+  };
   
- app.use(cors());
+ app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 5000;
 app.use("/api/auth",authRoutes)
